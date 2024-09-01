@@ -7,13 +7,41 @@ const url = 'https://es.wikipedia.org/wiki/Categor%C3%ADa:M%C3%BAsicos_de_rap' /
 const alphabet =['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
 const alphabetObject = {}
 
+const  filterByNumber = (letter) =>{
+    let data = []
+    for (const [key,values] of Object.entries(alphabetObject)) {
+           
+                
+        if (Number(key) ) {
+             
+            return data =  values.map(value =>  `<li><a href="https://es.wikipedia.org/wiki/${value}">${value}</a></li> `)
+        }else{
+            break;
+        }
+        
+    }
+}
+const  filterByLetter = (letter) =>{
+    let data = []
+    for (const [key,values] of Object.entries(alphabetObject)) {
+           
+                
+        if (key === letter.toLowerCase() ) {
+            console.log(letter);
+            return data =  values.map(value =>  `<li><a href="https://es.wikipedia.org/wiki/${value}">${value}</a></li>`).join('')
+        }
+       
+    }
+    return ''
+}
+
 app.get('/',(req,res) => {
     axios.get(url).then((response) => {
         if(response.status === 200) {
             const html = response.data
             const $ = cheerio.load(html)
-            const pageTitle = $('h1').text()
-            const p = $('p')
+            const pageTitle = $('#mw-pages h2').text()
+            const p = $('#mw-pages p')
 
             //console.log(p);
             
@@ -27,7 +55,7 @@ app.get('/',(req,res) => {
                 const link = $(element).attr('href')
                 links.push(link)
 
-                //console.log(links);
+                console.log(links);
                 
             })
 
@@ -45,29 +73,93 @@ app.get('/',(req,res) => {
                 //console.log(images);
                 
             })
-            console.log('------------------------');8   
+            
+            
             links.forEach(link => {
                 //console.log(link.split('/wiki/').join('')[0]);
                 const word =link.split('/wiki/').join('')
                 const firstLetter = link.split('/wiki/').join('')[0].toLowerCase()
                 
-                !alphabetObject[firstLetter] ?  alphabetObject[firstLetter] = [word] : alphabetObject[firstLetter].push(word)
-                
-                
-
-                
+                !alphabetObject[firstLetter] ?  alphabetObject[firstLetter] = [word] : alphabetObject[firstLetter].push(word)   
             });
-            console.log('------------------------');
-            console.log(alphabetObject);
+
+            
+           
             
             res.send(`
                 <h1>${pageTitle}</h1>
-                <h2>Subcategorias</h2>
+                <hr>
+                <br>
                 <p>${texts} </p>
-                <h3>
+                <br>
+                <br>
+                <div style=" display: flex; flex-direction: column; flex-wrap: wrap; height: 500px;">
+                <h3>0-9</h3>
                 <ul>
-                    ${links.sort().map(link => `<li><a href="https://es.wikipedia.org${link}">${link}</a></li>`).join('')} 
+                    ${filterByNumber(0)}
                 </ul>
+                <h3>A</h3>
+                <ul>
+                ${filterByLetter('A')}
+                </ul>
+
+                <h3>B</h3>
+                <ul> 
+                 ${filterByLetter('B')}
+                 </ul>
+                <h3>C</h3>
+                <ul>
+                 ${filterByLetter('C')}
+                 </ul>
+                <h3>D</h3>
+                <ul>
+                 ${filterByLetter('D')}
+                 </ul>
+                 <h3>F</h3>
+                <ul>
+                 ${filterByLetter('F')}
+                 </ul>
+                 <h3>G</h3>
+                <ul>
+                 ${filterByLetter('G')}
+                 </ul>
+                 <h3>J</h3>
+                <ul>
+                 ${filterByLetter('J')}
+                 </ul>
+                 <h3>K</h3>
+                <ul>
+                 ${filterByLetter('K')}
+                 </ul>
+                 <h3>L</h3>
+                <ul>
+                 ${filterByLetter('L')}
+                 </ul>
+                 <h3>M</h3>
+                <ul>
+                 ${filterByLetter('M')}
+                 </ul>
+                 <h3>N</h3>
+                <ul>
+                 ${filterByLetter('N')}
+                 </ul>
+                 <h3>R</h3>
+                <ul>
+                 ${filterByLetter('R')}
+                 </ul>
+                 <h3>S</h3>
+                <ul>
+                 ${filterByLetter('S')}
+                 </ul>
+                 <h3>T</h3>
+                <ul>
+                 ${filterByLetter('T')}
+                 </ul>
+                 <h3>W</h3>
+                <ul>
+                 ${filterByLetter('W')}
+                 </ul>
+                
                 `)
         }
     })
