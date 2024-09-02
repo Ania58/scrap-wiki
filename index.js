@@ -1,27 +1,25 @@
-const axios = require('axios')
-const cheerio = require('cheerio')
+const axios = require('axios') // Importing Axios, a library for making HTTP requests.
+const cheerio = require('cheerio')// Importing Cheerio, a library for parsing HTML and XML. It allows jQuery-like manipulation of the document.
 const express = require('express')
 const app = express()
 
 const url = 'https://es.wikipedia.org/wiki/Categor%C3%ADa:M%C3%BAsicos_de_rap' // the href attributes from Wikipedia might be relative
 const alphabet =['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
-const alphabetObject = {}
 
-const  filterByNumber = (letter) =>{
+const  filterByNumber = (alphabetObject) =>{ //to filter out entries from alphabetObject that are categorized under a numeric key 
     let data = []
-    for (const [key,values] of Object.entries(alphabetObject)) {
+    for (const [key,values] of Object.entries(alphabetObject)) { // Converts the alphabetObject into an array of key-value pairs.
            
                 
-        if (Number(key) ) {
+        if (!isNaN(key) ) {
              
-            return data =  values.map(value =>  `<li><a href="https://es.wikipedia.org/wiki/${value}">${value}</a></li> `)
-        }else{
-            break;
+            return data =  values.map(value =>  `<li><a href="https://es.wikipedia.org/wiki/${value}">${value}</a></li>`).join('') //Converts each value to an HTML list item
         }
-        
     }
+        
 }
-const  filterByLetter = (letter) =>{
+
+const  filterByLetter = (alphabetObject, letter) =>{ //If a key in alphabetObject matches the provided letter (case-insensitive), it returns an HTML string containing the corresponding list items.
     let data = []
     for (const [key,values] of Object.entries(alphabetObject)) {
            
@@ -35,11 +33,14 @@ const  filterByLetter = (letter) =>{
     return ''
 }
 
+
+
 app.get('/',(req,res) => {
+    const alphabetObject = {}  // An object to store rappers' names categorized by the first letter
     axios.get(url).then((response) => {
         if(response.status === 200) {
-            const html = response.data
-            const $ = cheerio.load(html)
+            const html = response.data // Store the HTML content from the response
+            const $ = cheerio.load(html) // Load the HTML into Cheerio for parsing
             const pageTitle = $('#mw-pages h2').text()
             const p = $('#mw-pages p')
 
@@ -77,10 +78,11 @@ app.get('/',(req,res) => {
             
             links.forEach(link => {
                 //console.log(link.split('/wiki/').join('')[0]);
-                const word =link.split('/wiki/').join('')
-                const firstLetter = link.split('/wiki/').join('')[0].toLowerCase()
+                const word =link.split('/wiki/').join('') // Remove "/wiki/" from link to get the page name
+                const firstLetter = link.split('/wiki/').join('')[0].toLowerCase() // Get the first letter and convert to lowercase
                 
-                !alphabetObject[firstLetter] ?  alphabetObject[firstLetter] = [word] : alphabetObject[firstLetter].push(word)   
+                !alphabetObject[firstLetter] ?  alphabetObject[firstLetter] = [word] : alphabetObject[firstLetter].push(word)  
+                //If alphabetObject[firstLetter] does not exist, it creates a new array with the current word and assigns it to alphabetObject[firstLetter]. If alphabetObject[firstLetter] already exists, it adds the word to the existing array using the push method.
             });
 
             
@@ -90,80 +92,84 @@ app.get('/',(req,res) => {
                 <h1>${pageTitle}</h1>
                 <hr>
                 <br>
-                <p>${texts} </p>
+                <p>${texts.join(' ')} </p>
                 <br>
                 <br>
                 <div style=" display: flex; flex-direction: column; flex-wrap: wrap; height: 500px;">
                 <h3>0-9</h3>
                 <ul>
-                    ${filterByNumber(0)}
+                    ${filterByNumber(alphabetObject, 0)}
                 </ul>
                 <h3>A</h3>
                 <ul>
-                ${filterByLetter('A')}
+                    ${filterByLetter(alphabetObject, 'A')}
                 </ul>
 
                 <h3>B</h3>
                 <ul> 
-                 ${filterByLetter('B')}
+                    ${filterByLetter(alphabetObject, 'B')}
                  </ul>
                 <h3>C</h3>
                 <ul>
-                 ${filterByLetter('C')}
+                    ${filterByLetter(alphabetObject, 'C')}
                  </ul>
                 <h3>D</h3>
                 <ul>
-                 ${filterByLetter('D')}
+                    ${filterByLetter(alphabetObject, 'D')}
                  </ul>
                  <h3>F</h3>
                 <ul>
-                 ${filterByLetter('F')}
+                    ${filterByLetter(alphabetObject, 'F')}
                  </ul>
                  <h3>G</h3>
                 <ul>
-                 ${filterByLetter('G')}
+                    ${filterByLetter(alphabetObject, 'G')}
                  </ul>
                  <h3>J</h3>
                 <ul>
-                 ${filterByLetter('J')}
+                    ${filterByLetter(alphabetObject, 'J')}
                  </ul>
                  <h3>K</h3>
                 <ul>
-                 ${filterByLetter('K')}
+                    ${filterByLetter(alphabetObject, 'K')}
                  </ul>
                  <h3>L</h3>
                 <ul>
-                 ${filterByLetter('L')}
+                    ${filterByLetter(alphabetObject, 'L')}
                  </ul>
                  <h3>M</h3>
                 <ul>
-                 ${filterByLetter('M')}
+                    ${filterByLetter(alphabetObject, 'M')}
                  </ul>
                  <h3>N</h3>
                 <ul>
-                 ${filterByLetter('N')}
+                    ${filterByLetter(alphabetObject, 'N')}
                  </ul>
                  <h3>R</h3>
                 <ul>
-                 ${filterByLetter('R')}
+                    ${filterByLetter(alphabetObject, 'R')}
                  </ul>
                  <h3>S</h3>
                 <ul>
-                 ${filterByLetter('S')}
+                    ${filterByLetter(alphabetObject, 'S')}
                  </ul>
                  <h3>T</h3>
                 <ul>
-                 ${filterByLetter('T')}
+                    ${filterByLetter(alphabetObject, 'T')}
                  </ul>
                  <h3>W</h3>
                 <ul>
-                 ${filterByLetter('W')}
+                    ${filterByLetter(alphabetObject, 'W')}
                  </ul>
                 
                 `)
         }
-    })
+    }).catch(error => {
+        console.error(error); // Log any errors that occur during the request
+        res.status(400).send('Error fetching data'); // Send a 400 response on error
+    });
 })
+
 
 app.listen(3000, () => {
     console.log('Express listening on port http://localhost:3000');
